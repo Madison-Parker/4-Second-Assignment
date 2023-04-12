@@ -27,6 +27,14 @@
     #AttSum , #AttResults {
       background-color: #cccccc;
     }
+
+    #AttResultsText {
+      display: none;
+    }
+
+    #table {
+      display: none;
+    }
   </style>
 
 </head>
@@ -64,7 +72,7 @@
             <th>Attempt Number</th>
             <th>Start Time</th>
             <th>Stop Time</th>
-            <th>Difference</th>
+            <th>Score</th>
           </tr>
           <tbody id = "summaryTable">
           </tbody>
@@ -74,10 +82,12 @@
       <div class = "col-md-6" align = "center">
         <button id = "AttResults" class="btn btn-info" onclick="attemptResults()">See All Attempts Results</button>
         <br><br>
-        <p id="totalAtt"> </p>
-        <p id="attMin"> </p>
-        <p id="attMax"> </p>
-        <p id="attAvg"> </p>
+        <div id="AttResultsText">
+          <p id="totalAtt"> </p>
+          <p id="attMin"> </p>
+          <p id="attMax"> </p>
+          <p id="attAvg"> </p>
+        </div>
       </div>
     </div>
   </div>
@@ -94,17 +104,25 @@
       var date1;
       var date2;
       var attemptsArray = [];
-      var tabClicks = 0;
-
       function createObject() {
         var object = {
           number: totalAttempts,
           sTime: date1,
           eTime: date2,
-          difference: (delta * .001)
+          score: delta
         }
         attemptsArray.push(object);
         console.log(attemptsArray);
+      }
+      function createTable() {
+        var table = document.getElementById("summaryTable");
+        var row = '<tr>' +
+                    '<td>'+ totalAttempts +'</td>' +
+                    '<td>'+ date1 +'</td>' +
+                    '<td>'+ date2 +'</td>' +
+                    '<td>'+ delta +'</td>' +
+                  '</tr>'
+        table.innerHTML += row;
       }
 
       function setSecs() {
@@ -142,6 +160,8 @@
         results.textContent = "You got " + (delta) + " seconds!";
 
         createObject();
+        createTable();
+
           if (delta > max) {
             max = delta;
           }
@@ -149,11 +169,16 @@
             min = delta;
           }
 
+        button.textContent = "Start";
+
         console.log("max = " + max);
         console.log("min = " + min);
         console.log("totalAttempts = " + totalAttempts);
 
-        button.textContent = "Start";
+        totalAtt.textContent = "Total attempts = " + totalAttempts;
+        attMin.textContent = "Min = " + min;
+        attMax.textContent = "Max = " + max;
+
         reset();
       }
     }
@@ -162,43 +187,32 @@
       clicks = 0;
       console.log("reset");
     }
-
     function attemptSummary() {
-      tabClicks++;
 
-      if (tabClicks == 1) {
-        var table = document.getElementById("summaryTable");
-        for (var i = 0; i < attemptsArray.length; i++) {
-          var row = '<tr>' +
-            '<td>'+ attemptsArray[i].number +'</td>' +
-            '<td>'+ attemptsArray[i].sTime +'</td>' +
-            '<td>'+ attemptsArray[i].eTime +'</td>' +
-            '<td>'+ attemptsArray[i].difference +'</td>' +
-            '</tr>'
-          table.innerHTML += row;
-        }
-        document.getElementById("table").style.display="block";
-        AttSum.textContent = "Hide Attempt Summary"
-        console.log(tabClicks);
-      }
-      else if (clicks == 2) {
-        document.getElementById("table").style.display="none";
-        $("#summaryTable").remove();
+      var x = document.getElementById("table");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+        AttSum.textContent = "Hide Attempt Summary";
+      } else {
+        x.style.display = "none";
         AttSum.textContent = "See Attempt Summary";
-        tabClicks = 0;
-        console.log(tabClicks + "2");
       }
     }
-
     function attemptResults() {
-
-
-      totalAtt.textContent = "Total attempts = " + totalAttempts;
-      attMin.textContent = "Min = " + min;
-      attMax.textContent = "Max = " + max;
-      attAvg.textContent = "Average = idk yet"
+        //honestly just gave up on the average
+      /*const onlyResults = JSON.parse(attemptsArray).filter({score});
+      const sum = onlyResults.reduce((total, current) => current + total, 0);
+      console.log(sum);*/
+      //console.log(average);
+      var x = document.getElementById("AttResultsText");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+        AttResults.textContent = "Hide All Attempt Results";
+      } else {
+        x.style.display = "none";
+        AttResults.textContent = "See All Attempt Results";
+      }
     }
-
   </script>
 
 </body>
